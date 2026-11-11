@@ -1,0 +1,6 @@
+{
+  "ssm:account=959067479367:parameterName=/genesis-cdk/rootDomain:region=us-east-1": "sconi.io",
+  "ssm:account=959067479367:parameterName=/sconi.io/hostedZoneId:region=us-east-1": "Z0367863FTQN44N92WNV",
+  "ssm:account=959067479367:parameterName=/sconi.io/hostedZoneName:region=us-east-1": "sconi.io",
+  "ssm:account=959067479367:parameterName=/sconi.io/certArn:region=us-east-1": "arn:aws:acm:us-east-1:959067479367:certificate/4731bf60-0321-470c-9f69-9aa30a3d8cf7"
+}

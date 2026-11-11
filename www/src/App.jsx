@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { getSunset, getSunsetAsDate } from './solar'
+import { getSunsetEpoch, getSunsetAsDate } from './solar'
 
 function App() {
   const [is18Holes, setIs18Holes] = useState(true)
@@ -10,8 +10,7 @@ function App() {
   let lon = -0.21451649021796887; // Fallback on lon of Cuddington GC
   let elev = 85.; // fallback on elev to cuddington GC
   navigator.geolocation.getCurrentPosition(({ coords }) => {
-    console.log(coords)
-    if ( 'latitude' in coords 
+    if ( 'latitude' in coords
       && 'longitude' in coords) {
       lat = coords.latitude;
       lon = coords.longitude;
@@ -20,17 +19,18 @@ function App() {
       elev = coords.altitude;
     }
   });
-  console.log('5, 10, 20:', getSunsetAsDate(5, 10, 20, new Date(1,6,2020)))
-  console.log('30, 100, 0:', getSunsetAsDate(30, 100, 0, new Date(1,1,2020)))
-  console.log('30, 100, 0:', getSunsetAsDate(30, 100, 0))
-  const sunsetEpoch = getSunsetEpoch(lat, lon, elev)
-  
+const JD_UNIX_EPOCH = 2440587.5
+  const sunsetEpoch = (getSunsetEpoch(lat, lon, elev) - JD_UNIX_EPOCH) * 86400000
+  const civilTwilightEpoch = (getSunsetEpoch(lat, lon, elev, new Date(), -6.0) - JD_UNIX_EPOCH) * 86400000
+
   const starttime = new Date(
-    sunsetEpoch
+    civilTwilightEpoch
     - (minutes * 60 * 1000)
     - (hours * 60 * 60 * 1000)
   );
   const teetime = `${starttime.toTimeString().substring(0,5)}`;
+  const sunsetTime = new Date(sunsetEpoch).toTimeString().substring(0, 5);
+  const civilTwilightTime = new Date(civilTwilightEpoch).toTimeString().substring(0, 5);
 
   const handleHolesChange = () => {
     if (is18Holes) {
@@ -50,7 +50,6 @@ function App() {
 
   const handleMinutesChange = (evt) => {
     let value = evt.target.value;
-    console.log(value);
     if (value > 55) {
       value = 0;
     } else if (value < 0) {
@@ -159,24 +158,16 @@ function App() {
                 </div>
               </div>
             </div>
-            sunset at: {new Date(sunset).toLocaleTimeString()}
+            <div className="flex justify-between text-sm text-gray-600 bg-gray-50 rounded-lg p-3">
+              <span>Sunset: <span className="font-semibold text-gray-800">{sunsetTime}</span></span>
+              <span>Last light: <span className="font-semibold text-gray-800">{civilTwilightTime}</span></span>
+            </div>
             {/* Display Total Time */}
             <div className="bg-gradient-to-r from-green-500 to-emerald-600 rounded-lg p-4 text-center shadow-md">
               <p className="text-white text-sm font-medium mb-1">You need to tee off before</p>
               <p className="text-white text-3xl font-bold">
                 {teetime}
               </p>
-            </div>
-          </div>
-
-          {/* Footer */}
-          <div className="mt-6 pt-6 border-t border-gray-200">
-            <div className="flex items-center justify-center gap-2 text-gray-500 text-sm">
-              <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                <circle cx="10" cy="10" r="8" className="text-green-200"/>
-                <circle cx="10" cy="10" r="3" className="text-white"/>
-              </svg>
-              <span>Perfect for tracking your pace</span>
             </div>
           </div>
         </div>
